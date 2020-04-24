@@ -102,15 +102,15 @@ func (r *ReconcileLineMessengerGateway) Reconcile(request reconcile.Request) (re
 		return reconcile.Result{}, err
 	}
 
-	// Define a new Pod object
-	deploymentconf := newPodForCR(instance)
+	// Define a new Deployment object
+	deploymentconf := newDeploymentForCR(instance)
 
 	// Set LineMessengerGateway instance as the owner and controller
 	if err := controllerutil.SetControllerReference(instance, deploymentconf, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Check if this Pod already exists
+	// Check if this Deployment already exists
 	found := &appsv1.Deployment{}
 	err = r.client.Get(context.TODO(), types.NamespacedName{Name: deploymentconf.Name, Namespace: deploymentconf.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
@@ -120,19 +120,19 @@ func (r *ReconcileLineMessengerGateway) Reconcile(request reconcile.Request) (re
 			return reconcile.Result{}, err
 		}
 
-		// Pod created successfully - don't requeue
+		// Deployment created successfully - don't requeue
 		return reconcile.Result{}, nil
 	} else if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Pod already exists - don't requeue
+	// Deployment already exists - don't requeue
 	reqLogger.Info("Skip reconcile: Deployment already exists", "Deployment namespace", found.Namespace, "Deployment name", found.Name)
 	return reconcile.Result{}, nil
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *redhatcopv1alpha1.LineMessengerGateway) *appsv1.Deployment {
+// newDeploymentForCR returns a deployment config
+func newDeploymentForCR(cr *redhatcopv1alpha1.LineMessengerGateway) *appsv1.Deployment {
     labels := map[string]string{
 		"apps": cr.Name,
 	}
@@ -150,6 +150,7 @@ func newPodForCR(cr *redhatcopv1alpha1.LineMessengerGateway) *appsv1.Deployment 
 			}},
 		}},
 	}
+	var RepSize = cr.Spec.Size
 
 	DeploymentConf := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -162,6 +163,7 @@ func newPodForCR(cr *redhatcopv1alpha1.LineMessengerGateway) *appsv1.Deployment 
 			Labels: labels,
 		},
 		Spec: appsv1.DeploymentSpec{
+			Replicas: &RepSize,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
