@@ -96,10 +96,14 @@ func (r *ReconcileLineMessengerGateway) Reconcile(request reconcile.Request) (re
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
-			return reconcile.Result{}, nil
+			return reconcile.Result{
+				Requeue: true,
+			}, nil
 		}
 		// Error reading the object - requeue the request.
-		return reconcile.Result{}, err
+		return reconcile.Result{
+			Requeue: true,
+		}, err
 	}
 
 	// Define a new Deployment object
@@ -107,7 +111,9 @@ func (r *ReconcileLineMessengerGateway) Reconcile(request reconcile.Request) (re
 
 	// Set LineMessengerGateway instance as the owner and controller
 	if err := controllerutil.SetControllerReference(instance, deploymentconf, r.scheme); err != nil {
-		return reconcile.Result{}, err
+		return reconcile.Result{
+			Requeue: true,
+		}, err
 	}
 
 	// Check if this Deployment already exists
@@ -117,18 +123,26 @@ func (r *ReconcileLineMessengerGateway) Reconcile(request reconcile.Request) (re
 		reqLogger.Info("Creating a new deployment object", "Deployname namespace", deploymentconf.Namespace, "Deployment name", deploymentconf.Name)
 		err = r.client.Create(context.TODO(), deploymentconf)
 		if err != nil {
-			return reconcile.Result{}, err
+			return reconcile.Result{
+				Requeue: true,
+			}, err
 		}
 
 		// Deployment created successfully - don't requeue
-		return reconcile.Result{}, nil
+		return reconcile.Result{
+			Requeue: true,
+		}, nil
 	} else if err != nil {
-		return reconcile.Result{}, err
+		return reconcile.Result{
+			Requeue: true,
+		}, err
 	}
 
 	// Deployment already exists - don't requeue
 	reqLogger.Info("Skip reconcile: Deployment already exists", "Deployment namespace", found.Namespace, "Deployment name", found.Name)
-	return reconcile.Result{}, nil
+	return reconcile.Result{
+		Requeue: true,
+	}, nil
 }
 
 // newDeploymentForCR returns a deployment config
