@@ -16,7 +16,7 @@ spec:
       containers:
         - name: alertmanager-line-gateway-operator
           # Replace this with the built image name
-          image: REPLACE_IMAGE
+          image: quay.io/mzali/linemessenger-operator:v0.0.2
           command:
           - alertmanager-line-gateway-operator
           imagePullPolicy: Always
