@@ -1,0 +1,61 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: linemessengergateways.redhatcop.redhat.io
+spec:
+  group: redhatcop.redhat.io
+  names:
+    kind: LineMessengerGateway
+    listKind: LineMessengerGatewayList
+    plural: linemessengergateways
+    singular: linemessengergateway
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: LineMessengerGateway is the Schema for the linemessengergateways
+        API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: LineMessengerGatewaySpec defines the desired state of LineMessengerGateway
+          properties:
+            image:
+              type: string
+            size:
+              description: Deployment size
+              format: int32
+              type: integer
+          required:
+          - image
+          - size
+          type: object
+        status:
+          description: LineMessengerGatewayStatus defines the observed state of LineMessengerGateway
+          properties:
+            nodes:
+              description: Pods status
+              items:
+                type: string
+              type: array
+          required:
+          - nodes
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true

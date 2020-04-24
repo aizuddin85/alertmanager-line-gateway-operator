@@ -1,0 +1,8 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: LineMessengerGateway
+metadata:
+  name: example-linemessengergateway
+spec:
+  # Add fields here
+  size: 2
+  image: "quay.io/redhat/alertmanager-line-gateway:latest"
